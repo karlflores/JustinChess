@@ -84,6 +84,9 @@ class Board{
 		void printBitBoard(PieceType pt){
 			int boardWidth = 8;
 			cout << "BOARD: [" << pt << "]\n";
+
+			// print the bit board in an 8 x 8 grid that mirrors the file rank system 
+			// of chess
 			for(int rank = boardWidth-1; rank >= 0 ; rank--){
 				for(int file = 0; file < 8 ; file ++){
 					cout << containsPiece(pt, static_cast<SquarePos>(rank*boardWidth + file));
