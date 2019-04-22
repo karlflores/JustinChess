@@ -84,4 +84,8 @@ class Board{
 		// maybe we handle the moving of the piece in the Chess Class 
 
 		void movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos);
+
+		// copy board
+		Board copy();
+
 };

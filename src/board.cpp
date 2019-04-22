@@ -100,4 +100,14 @@ void Board::movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos){
 	// todo -- make sure that the pWhite and pBlack bitboards are updated 
 }
 
+Board Board::copy(){
+	// create a new copy of the board, then copy everything inside the array  
+	Board newBoard = Board();
+	
+	for(int i = 0 ; i <=7; i++){
+		newBoard.pieceBB[i] = pieceBB[i];
+	}
+
+	return newBoard;
+}
 
