@@ -195,6 +195,7 @@ int main(){
 	// testing each of the magic numbers to see if they are correct	
 	board.setBoard(board.pWhite,board.getBitBoard(board.pWhite) & 
 								board.getBitBoard(board.pPawn));	
+
 	board.printBitBoard(board.pWhite);
 
 	return 0;
