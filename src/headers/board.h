@@ -3,34 +3,47 @@
 #include <vector> 
 
 #define NUM_PIECES 8
+#define MAX_STR_LEN 20
+#define MAX_PT_NUM 8
 typedef unsigned long long u_int64;
+using namespace std;
 
 class Board{ 
 	// Definitions 
 	private:
 		u_int64 pieceBB[NUM_PIECES];
-
+		string pt_names[MAX_PT_NUM] = 
+		{
+			"WHITE",
+			"BLACK",
+			"PPAWN",
+			"PKNIGHT",
+			"PBISHOP",
+			"PROOK",
+			"PQUEEN",
+			"PKING"
+		};
 	public:
 		
 		Board(void);
 		
 		// PieceType enum -- for indexing on the pieceBB
 		enum PieceType{
-			pWhite,
-			pBlack,
-			pPawn,
-			pKnight,
-			pBishop,
-			pRook,
-			pQueen,
-			pKing	
+			P_WHITE,
+			P_BLACK,
+			P_PAWN,
+			P_KNIGHT,
+			P_BISHOP,
+			P_ROOK,
+			P_QUEEN,
+			P_KING,	
 		};
 		
 		enum ColourType{
 			white,
 			black, 	
 		};
-
+		
 		// NOTE these are Little Endian Rank File Mapping Magic Numbers 
 		static const u_int64 AFILE =            	0x0101010101010101;
 		static const u_int64 HFILE =           		0x8080808080808080;
@@ -88,4 +101,5 @@ class Board{
 		// copy board
 		Board copy();
 
+		string pt_name(PieceType pt);
 };

@@ -11,24 +11,24 @@ using namespace std;
 // Constructor 
 Board::Board(){
 	// set the initial positions of each piece 
-	pieceBB[pWhite] = Board::RANK1 | (Board::RANK1 << 8) ;
-	pieceBB[pBlack] = (Board::RANK8 >> 8) | Board::RANK8;	
+	pieceBB[P_WHITE] = Board::RANK1 | (Board::RANK1 << 8) ;
+	pieceBB[P_BLACK] = (Board::RANK8 >> 8) | Board::RANK8;	
 
 	// now for each of the pieces -- here we are bitshifting by the actual square position 
 	// on the board 
 	
-	//pPawn
-	pieceBB[pPawn] = (Board::RANK1 << 8) | (Board::RANK8 >> 8);	
-	//pKnight
-	pieceBB[pKnight] = 0L | 1L << (B1) | 1L << (G1) | 1L << (G8) | 1L << (B8);
-	//pBishop
-	pieceBB[pBishop] = 0L | 1L << (C1) | 1L << (F1) | 1L << (F8) | 1L << (C8);
-	//pRook
-	pieceBB[pRook] = 0L | 1L << (A1) | 1L << (H8) | 1L << (H1) | 1L << (A8);
-	//pQueen
-	pieceBB[pQueen] = 0L | 1L << (D1) | 1L << (D8); 
-	//pKing	
-	pieceBB[pKing] = 0L | 1L << (E1) | 1L << (E8); 
+	//P_PAWN
+	pieceBB[P_PAWN] = (Board::RANK1 << 8) | (Board::RANK8 >> 8);	
+	//P_KNIGHT
+	pieceBB[P_KNIGHT] = 0L | 1L << (B1) | 1L << (G1) | 1L << (G8) | 1L << (B8);
+	//P_BISHOP
+	pieceBB[P_BISHOP] = 0L | 1L << (C1) | 1L << (F1) | 1L << (F8) | 1L << (C8);
+	//P_ROOK
+	pieceBB[P_ROOK] = 0L | 1L << (A1) | 1L << (H8) | 1L << (H1) | 1L << (A8);
+	//P_QUEEN
+	pieceBB[P_QUEEN] = 0L | 1L << (D1) | 1L << (D8); 
+	//P_KING	
+	pieceBB[P_KING] = 0L | 1L << (E1) | 1L << (E8); 
 	
 }
 
@@ -45,7 +45,7 @@ u_int64 Board::getBitBoard(PieceType pt){
 }
 // test function to get all the pawns on the board 
 u_int64 Board::getPawns(PieceType ct){
-	return pieceBB[pPawn] & pieceBB[ct];
+	return pieceBB[P_PAWN] & pieceBB[ct];
 }
 
 // test functions for setting, getting pieces on the board
@@ -56,7 +56,7 @@ void Board::setBoard(PieceType pt, u_int64 board){
 // print the board in a logical manner 
 void Board::printBitBoard(PieceType pt){
 	int boardWidth = 8;
-	cout << "BOARD: [" << pt << "]\n";
+	cout << "BOARD: [" << pt_name(pt) << "]\n";
 
 	// print the bit board in an 8 x 8 grid that mirrors the file rank system 
 	// of chess
@@ -97,7 +97,7 @@ void Board::movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos){
 	// set the new location to a 1 
 	pieceBB[pt] = pieceBB[pt] | getMovingMask(newPos);
 
-	// todo -- make sure that the pWhite and pBlack bitboards are updated 
+	// todo -- make sure that the P_WHITE and P_BLACK bitboards are updated 
 }
 
 Board Board::copy(){
@@ -111,3 +111,7 @@ Board Board::copy(){
 	return newBoard;
 }
 
+// get the name of the piece type enum for printing
+string Board::pt_name(PieceType pt){
+	return pt_names[pt];
+}
