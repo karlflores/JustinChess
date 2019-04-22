@@ -43,7 +43,32 @@ class Board{
 			white,
 			black, 	
 		};
-		
+
+		// location offsets  
+		enum RayDirections{
+			N = 8,
+			NE = 1,
+			SE = -7,
+			S = -8,
+			SW = -9,
+			W = -1,
+			NW =7,
+		};
+
+		// knight directions 
+
+		enum KnightDirections{
+			NNW = 15,
+			NNE = 17,
+			NEE = 10,
+			SEE = -6,
+			SSE = -15,
+			SSW = -17,
+			SWW = -10,
+		   	NWW = 6,	
+		};
+
+
 		// NOTE these are Little Endian Rank File Mapping Magic Numbers 
 		static const u_int64 AFILE =            	0x0101010101010101;
 		static const u_int64 HFILE =           		0x8080808080808080;
