@@ -115,3 +115,11 @@ Board Board::copy(){
 string Board::pt_name(PieceType pt){
 	return pt_names[pt];
 }
+
+u_int64 Board::getEmptyPieces(){
+	return ~(piecesBB[P_WHITE] | piecesBB[P_BLACK]);
+}
+
+u_int64 Board::singlePawnPushTargets(int colour){			
+	return ( (pawns << 8) >> (colour << 4) ) & getEmptyPieces(); 
+}

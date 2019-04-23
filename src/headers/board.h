@@ -122,9 +122,20 @@ class Board{
 		// maybe we handle the moving of the piece in the Chess Class 
 
 		void movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos);
-
+		
+		u_int64 getEmptyPieces();
 		// copy board
 		Board copy();
 
 		string pt_name(PieceType pt);
+
+
+		// PAWN MOVES
+		u_int64 singlePawnPushDest(int colour);			
+		u_int64 doublePawnPushDest(int colour);
+
+		u_int64 wPawnsPushSrc();
+		u_int64 bPawnsPushSrc();
+
+
 };
