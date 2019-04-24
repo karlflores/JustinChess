@@ -116,10 +116,147 @@ string Board::pt_name(PieceType pt){
 	return pt_names[pt];
 }
 
-u_int64 Board::getEmptyPieces(){
-	return ~(piecesBB[P_WHITE] | piecesBB[P_BLACK]);
+u_int64 Board::getEmptySquares(){
+	return ~(pieceBB[P_WHITE] | pieceBB[P_BLACK]);
 }
 
-u_int64 Board::singlePawnPushTargets(int colour){			
-	return ( (pawns << 8) >> (colour << 4) ) & getEmptyPieces(); 
+//Board Transformations 
+
+u_int64 Board::tNorth(u_int64 bb){
+	return bb << 8;
+}
+
+u_int64 Board::tSouth(u_int64 bb){
+	return bb >> 8;
+}
+
+u_int64 Board::tEast(u_int64 bb){
+	return (bb << 1) & Board::NOT_A_FILE; 
+}
+
+u_int64 Board::tWest(u_int64 bb){
+	return (bb >> 1) & Board::NOT_H_FILE;
+}
+
+u_int64 Board::tNorthEast(u_int64 bb){
+	return (bb << 9) & Board::NOT_A_FILE;
+}
+
+u_int64 Board::tNorthWest(u_int64 bb){
+	return (bb << 7 ) & Board::NOT_H_FILE;
+}
+
+u_int64 Board::tSouthEast(u_int64 bb){
+	return (bb >> 7) & Board::NOT_A_FILE;
+
+}
+
+u_int64 Board::tSouthWest(u_int64 bb){
+	return (bb >> 9 ) & Board::NOT_H_FILE;
+}
+/*
+u_int64 Board::singlePawnPushDest(int colour){			
+	u_int64 pawns = pieceBB[colour] & pieceBB[P_PAWN];
+	return ( (pawns << 8) >> (colour << 4) ) & getEmptySquares(); 
+}
+
+u_int64 Board::singlePawnPushDest(int colour){			
+	u_int64 pawns = pieceBB[colour] & pieceBB[P_PAWN];
+	return ((pawns << 8) >> (colour << 4)) & getEmptySquares(); 
+}
+*/
+
+// Pawn movements 
+
+u_int64 Board::wSinglePawnPushDest(){
+	// shift the board up by one rank, and with the empty squares 
+	// to get the destinations of pawns if they move one square 
+	return tNorth(pieceBB[P_WHITE]) & getEmptySquares();
+}
+
+u_int64 Board::bSinglePawnPushDest(){
+	// shift the board down by one rank
+	return tSouth(pieceBB[P_BLACK]) & getEmptySquares();
+}
+
+
+u_int64 Board::wDoublePawnPushDest(){
+	u_int64 RANK4 = RANK1 << 8*3;
+	u_int64 singlePushes = wSinglePawnPushDest();
+
+	// find the single push of that colour 
+	// shift it up one rank, and it with rank 4 to get 
+	// the possible positions in that rank 
+	return tNorth(singlePushes) & RANK4 & getEmptySquares();
+}
+
+u_int64 Board::bDoublePawnPushDest(){
+	u_int64 RANK5 = RANK1 << 8*4;
+	u_int64 singlePushes = bSinglePawnPushDest();
+	return tSouth(singlePushes) & RANK5 & getEmptySquares();
+}
+
+u_int64 Board::wSinglePawnPushSrc(){
+	return tSouth(getEmptySquares()) & pieceBB[P_WHITE];
+}
+
+u_int64 Board::bSinglePawnPushSrc(){
+	return tNorth(getEmptySquares()) & pieceBB[P_BLACK];
+}
+
+u_int64 Board::wDoublePawnPushSrc(){
+	u_int64 RANK4 = RANK1 << 8*3;
+	u_int64 emptyRANK3 =  tSouth(getEmptySquares() & RANK4) & getEmptySquares();
+	// find the single push destinations for the white pawns and and it with 
+	return pieceBB[P_WHITE] & tSouth(emptyRANK3);
+}
+
+u_int64 Board::bDoublePawnPushSrc(){
+	u_int64 RANK5 = RANK1 << 8*4;
+	u_int64 emptyRANK6 = tNorth(getEmptySquares() & RANK5) & getEmptySquares();
+	// find the single push destinations for the white pawns and and it with 
+	return pieceBB[P_BLACK] & tNorth(emptyRANK6);
+
+}
+
+// Pawn Attacks 
+
+u_int64 Board::wPawnEastAttacks(){
+	return tNorthEast(pieceBB[P_WHITE]);
+}
+
+u_int64 Board::wPawnWestAttacks(){
+	return tNorthWest(pieceBB[P_WHITE]);
+}
+
+u_int64 Board::bPawnEastAttacks(){
+	return tSouthEast(pieceBB[P_BLACK]);
+}
+
+u_int64 Board::bPawnWestAttacks(){
+	return tSouthWest(pieceBB[P_BLACK]);
+}
+
+u_int64 Board::wPawnAllAttacks(){
+	return wPawnEastAttacks() | wPawnWestAttacks();
+}
+
+u_int64 Board::wPawnDoubleAttacks(){
+	return wPawnEastAttacks() & wPawnWestAttacks();
+}
+
+u_int64 Board::wPawnSingleAttacks(){
+	return wPawnEastAttacks() ^ wPawnWestAttacks();
+}
+
+u_int64 Board::bPawnAllAttacks(){
+	return bPawnEastAttacks() | bPawnWestAttacks();
+}
+
+u_int64 Board::bPawnDoubleAttacks(){
+	return bPawnEastAttacks() & bPawnWestAttacks();
+}
+
+u_int64 Board::bPawnSingleAttacks(){
+	return bPawnEastAttacks() ^ bPawnWestAttacks();
 }

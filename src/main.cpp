@@ -41,10 +41,13 @@ int main(){
 	}
 	
 	// testing each of the magic numbers to see if they are correct	
+	/*
 	board.setBoard(board.P_WHITE,board.getBitBoard(board.P_WHITE) & 
 								board.getBitBoard(board.P_PAWN));	
 
 	board.printBitBoard(board.P_WHITE);
-
+*/	
+	board.setBoard(board.P_WHITE,board.bDoublePawnPushSrc());
+	board.printBitBoard(board.P_WHITE);
 	return 0;
 }

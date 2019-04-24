@@ -78,7 +78,8 @@ class Board{
 		static const u_int64 ANTIDIAGONAL = 	 	0x0102040810204080;
 		static const u_int64 LIGHT_SQUARES =    	0x55AA55AA55AA55AA;
 		static const u_int64 DARK_SQUARES =     	0xAA55AA55AA55AA55;
-		
+		static const u_int64 NOT_A_FILE = 			0xfefefefefefefefe;
+		static const u_int64 NOT_H_FILE = 			0x7f7f7f7f7f7f7f7f;
 		// NOTE: we are using Little Endian Rank-File Mappings 	
 		enum SquarePos{
 			A1, B1, C1, D1, E1, F1, G1, H1,
@@ -123,19 +124,43 @@ class Board{
 
 		void movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos);
 		
-		u_int64 getEmptyPieces();
+		u_int64 getEmptySquares();
 		// copy board
 		Board copy();
 
 		string pt_name(PieceType pt);
+		
+		// Board transformations 
 
+		u_int64 tNorth(u_int64 bb);
+		u_int64 tSouth(u_int64 bb);
+		u_int64 tEast(u_int64 bb);
+		u_int64 tWest(u_int64 bb);
+		
+		u_int64 tNorthEast(u_int64 bb);
+		u_int64 tNorthWest(u_int64 bb);
+		u_int64 tSouthEast(u_int64 bb);
+		u_int64 tSouthWest(u_int64 bb);
 
 		// PAWN MOVES
-		u_int64 singlePawnPushDest(int colour);			
-		u_int64 doublePawnPushDest(int colour);
+		u_int64 wSinglePawnPushDest();			
+		u_int64 bSinglePawnPushDest();			
+		u_int64 wDoublePawnPushDest();
+		u_int64 bDoublePawnPushDest();
 
-		u_int64 wPawnsPushSrc();
-		u_int64 bPawnsPushSrc();
+		u_int64 wSinglePawnPushSrc();
+		u_int64 wDoublePawnPushSrc();
+		u_int64 bSinglePawnPushSrc();
+		u_int64 bDoublePawnPushSrc();
+		
+		// PAWN ATTACKS 
+		u_int64 wPawnEastAttacks();
+		u_int64 wPawnWestAttacks();
+		u_int64 bPawnEastAttacks();
+		u_int64 bPawnWestAttacks();
 
+		u_int64 wPawnAllAttacks();
+		u_int64 wPawnDoubleAttacks();
+		u_int64 wPawnSingleAttacks();
 
 };
