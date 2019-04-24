@@ -47,7 +47,14 @@ int main(){
 
 	board.printBitBoard(board.P_WHITE);
 */	
-	board.setBoard(board.P_WHITE,board.bDoublePawnPushSrc());
+	// move pawn from A2 to A3
+	board = Board();
 	board.printBitBoard(board.P_WHITE);
+	board.movePiece(board.P_BLACK,board.P_PAWN,Board::D7,Board::D5);
+	board.movePiece(board.P_WHITE,board.P_PAWN,Board::C2,Board::C4);
+	board.printBitBoard(board.P_WHITE);	
+	board.printBitBoard(board.P_PAWN);	
+	board.setBoard(board.P_PAWN,board.bPawnCaptureAll() | board.wPawnCaptureEast());
+	board.printBitBoard(board.P_PAWN);
 	return 0;
 }

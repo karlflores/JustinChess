@@ -3,13 +3,15 @@ CC = g++
 
 CPPFLAGS = -g -Wall -std=c++11
 OBJS = board.o main.o
+SRCS = src/board.cpp src/main.cpp
 
-$(PROG) : $(OBJS)
+all: $(PROG)
+
+$(PROG) : $(OBJS) Makefile
 	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS)
-board.o : 
-	$(CC) $(CPPFLAGS) -c src/board.cpp
-main.o : 
-	$(CC) $(CPPFLAGS) -c src/main.cpp
+
+$(OBJS) : 
+	$(CC) $(CPPFLAGS) -c $(SRCS)
 
 clean: 
 	rm -f core $(PROG) $(OBJS)

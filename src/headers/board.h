@@ -16,12 +16,12 @@ class Board{
 		{
 			"WHITE",
 			"BLACK",
-			"PPAWN",
-			"PKNIGHT",
-			"PBISHOP",
-			"PROOK",
-			"PQUEEN",
-			"PKING"
+			"P_PAWN",
+			"P_KNIGHT",
+			"P_BISHOP",
+			"P_ROOK",
+			"P_QUEEN",
+			"P_KING"
 		};
 	public:
 		
@@ -122,9 +122,15 @@ class Board{
 		// NOTE: this is not a safe function, we need to wrap it in a new function
 		// maybe we handle the moving of the piece in the Chess Class 
 
+		// Move a piece on a specific bitboard 
 		void movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos);
+
+		// Move a coloured piece on the board, as well as moving it on the 
+		// specific bitboard 
+		void movePiece(PieceType pt, PieceType ct, SquarePos oldPos, SquarePos newPos);
 		
 		u_int64 getEmptySquares();
+
 		// copy board
 		Board copy();
 
@@ -162,5 +168,17 @@ class Board{
 		u_int64 wPawnAllAttacks();
 		u_int64 wPawnDoubleAttacks();
 		u_int64 wPawnSingleAttacks();
+		
+		u_int64 bPawnAllAttacks();
+		u_int64 bPawnDoubleAttacks();
+		u_int64 bPawnSingleAttacks();
+		// PAWN CAPTURES 
 
+		u_int64 wPawnCaptureEast();
+		u_int64 wPawnCaptureWest();
+		u_int64 wPawnCaptureAll();
+
+		u_int64 bPawnCaptureEast();
+		u_int64 bPawnCaptureWest();
+		u_int64 bPawnCaptureAll();
 };

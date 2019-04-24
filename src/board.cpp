@@ -92,14 +92,18 @@ u_int64 Board::getMovingMask(SquarePos pos){
 void Board::movePiece(PieceType pt, SquarePos oldPos, SquarePos newPos){
 	
 	// set the old location to a zero 
-	pieceBB[pt] = pieceBB[pt] & !(getMovingMask(oldPos));
-
+	
+	pieceBB[pt] = pieceBB[pt] & ~(getMovingMask(oldPos));
 	// set the new location to a 1 
 	pieceBB[pt] = pieceBB[pt] | getMovingMask(newPos);
 
 	// todo -- make sure that the P_WHITE and P_BLACK bitboards are updated 
 }
 
+void Board::movePiece(PieceType pt, PieceType ct, SquarePos oldPos, SquarePos newPos){
+	movePiece(pt, oldPos, newPos);
+	movePiece(ct, oldPos, newPos);	
+}
 Board Board::copy(){
 	// create a new copy of the board, then copy everything inside the array  
 	Board newBoard = Board();
@@ -154,29 +158,18 @@ u_int64 Board::tSouthEast(u_int64 bb){
 u_int64 Board::tSouthWest(u_int64 bb){
 	return (bb >> 9 ) & Board::NOT_H_FILE;
 }
-/*
-u_int64 Board::singlePawnPushDest(int colour){			
-	u_int64 pawns = pieceBB[colour] & pieceBB[P_PAWN];
-	return ( (pawns << 8) >> (colour << 4) ) & getEmptySquares(); 
-}
-
-u_int64 Board::singlePawnPushDest(int colour){			
-	u_int64 pawns = pieceBB[colour] & pieceBB[P_PAWN];
-	return ((pawns << 8) >> (colour << 4)) & getEmptySquares(); 
-}
-*/
 
 // Pawn movements 
 
 u_int64 Board::wSinglePawnPushDest(){
 	// shift the board up by one rank, and with the empty squares 
 	// to get the destinations of pawns if they move one square 
-	return tNorth(pieceBB[P_WHITE]) & getEmptySquares();
+	return tNorth(getPieceSet(P_PAWN,P_WHITE)) & getEmptySquares();
 }
 
 u_int64 Board::bSinglePawnPushDest(){
 	// shift the board down by one rank
-	return tSouth(pieceBB[P_BLACK]) & getEmptySquares();
+	return tSouth(getPieceSet(P_PAWN,P_BLACK)) & getEmptySquares();
 }
 
 
@@ -197,44 +190,44 @@ u_int64 Board::bDoublePawnPushDest(){
 }
 
 u_int64 Board::wSinglePawnPushSrc(){
-	return tSouth(getEmptySquares()) & pieceBB[P_WHITE];
+	return tSouth(getEmptySquares()) & getPieceSet(P_PAWN,P_WHITE) & pieceBB[P_PAWN];
 }
 
 u_int64 Board::bSinglePawnPushSrc(){
-	return tNorth(getEmptySquares()) & pieceBB[P_BLACK];
+	return tNorth(getEmptySquares()) & getPieceSet(P_PAWN,P_BLACK);
 }
 
 u_int64 Board::wDoublePawnPushSrc(){
 	u_int64 RANK4 = RANK1 << 8*3;
 	u_int64 emptyRANK3 =  tSouth(getEmptySquares() & RANK4) & getEmptySquares();
 	// find the single push destinations for the white pawns and and it with 
-	return pieceBB[P_WHITE] & tSouth(emptyRANK3);
+	return getPieceSet(P_PAWN,P_WHITE) & tSouth(emptyRANK3);
 }
 
 u_int64 Board::bDoublePawnPushSrc(){
 	u_int64 RANK5 = RANK1 << 8*4;
 	u_int64 emptyRANK6 = tNorth(getEmptySquares() & RANK5) & getEmptySquares();
 	// find the single push destinations for the white pawns and and it with 
-	return pieceBB[P_BLACK] & tNorth(emptyRANK6);
+	return getPieceSet(P_PAWN,P_BLACK) & tNorth(emptyRANK6);
 
 }
 
 // Pawn Attacks 
 
 u_int64 Board::wPawnEastAttacks(){
-	return tNorthEast(pieceBB[P_WHITE]);
+	return tNorthEast(getPieceSet(P_PAWN,P_WHITE));
 }
 
 u_int64 Board::wPawnWestAttacks(){
-	return tNorthWest(pieceBB[P_WHITE]);
+	return tNorthWest(getPieceSet(P_PAWN,P_WHITE));
 }
 
 u_int64 Board::bPawnEastAttacks(){
-	return tSouthEast(pieceBB[P_BLACK]);
+	return tSouthEast(getPieceSet(P_PAWN,P_BLACK));
 }
 
 u_int64 Board::bPawnWestAttacks(){
-	return tSouthWest(pieceBB[P_BLACK]);
+	return tSouthWest(getPieceSet(P_PAWN,P_BLACK));
 }
 
 u_int64 Board::wPawnAllAttacks(){
@@ -259,4 +252,29 @@ u_int64 Board::bPawnDoubleAttacks(){
 
 u_int64 Board::bPawnSingleAttacks(){
 	return bPawnEastAttacks() ^ bPawnWestAttacks();
+}
+
+// Pawn Captures 
+u_int64 Board::wPawnCaptureEast(){
+	return getPieceSet(P_PAWN,P_WHITE) & bPawnWestAttacks();
+}
+
+u_int64 Board::wPawnCaptureWest(){
+	return getPieceSet(P_PAWN,P_WHITE) & bPawnEastAttacks();
+}
+
+u_int64 Board::wPawnCaptureAll(){
+	return getPieceSet(P_PAWN,P_WHITE) & bPawnAllAttacks();
+}
+
+u_int64 Board::bPawnCaptureEast(){
+	return getPieceSet(P_PAWN,P_BLACK) & wPawnWestAttacks();
+}
+
+u_int64 Board::bPawnCaptureWest(){
+	return getPieceSet(P_PAWN,P_BLACK) & wPawnEastAttacks();
+}
+
+u_int64 Board::bPawnCaptureAll(){
+	return getPieceSet(P_PAWN,P_BLACK) & wPawnAllAttacks();
 }
