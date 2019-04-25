@@ -2,8 +2,9 @@
 
 using namespace std;
 
-		// PieceType enum -- for indexing on the pieceBB
-
+//
+//NOTE WHEN SHIFTING COLUMNS -> SHIFT 1 COL to the RIGHT << 1
+//1 ROW UP << 8
 /*
  * METHODS ON THE BOARD 
  */
@@ -322,13 +323,13 @@ void Board::knightAttackSetGeneration(){
 		currKnight = start << i;
 
 		Board::knightAttackSet[i] = tNNW(currKnight) | 
-									 tNNE(currKnight) | 
-									 tNEE(currKnight) |	
-									 tSEE(currKnight) | 
-									 tSSE(currKnight) |
-									 tSSW(currKnight) |
-									 tSWW(currKnight) |
-									 tNWW(currKnight); 
+									tNNE(currKnight) | 
+									tNEE(currKnight) |	
+									tSEE(currKnight) | 
+									tSSE(currKnight) |
+									tSSW(currKnight) |
+									tSWW(currKnight) |
+									tNWW(currKnight); 
 	}
 }
 
