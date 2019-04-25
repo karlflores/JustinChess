@@ -1,4 +1,5 @@
 #include "headers/board.h"
+
 using namespace std;
 
 int main(){
@@ -56,5 +57,18 @@ int main(){
 	board.printBitBoard(board.P_PAWN);	
 	board.setBoard(board.P_PAWN,board.bPawnCaptureAll() | board.wPawnCaptureEast());
 	board.printBitBoard(board.P_PAWN);
+
+	for(int i = 0 ; i < 64 ; i++){
+		cout << "KNIGHT AT " << i << "\n";
+		board.setBoard(board.P_KNIGHT,board.kingAttackSet[i]);
+		board.printBitBoard(board.P_KNIGHT);
+	}
+	board.setBoard(board.P_KNIGHT,Board::NOT_A_FILE);
+	board.printBitBoard(board.P_KNIGHT);
+	board.setBoard(board.P_KNIGHT,Board::NOT_H_FILE);
+	board.printBitBoard(board.P_KNIGHT);
+	
+
+	board.deleteStructures();
 	return 0;
 }

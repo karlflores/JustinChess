@@ -3,6 +3,7 @@
 #include <vector> 
 
 #define NUM_PIECES 8
+#define NUM_SQUARES 64
 #define MAX_STR_LEN 20
 #define MAX_PT_NUM 8
 typedef unsigned long long u_int64;
@@ -23,6 +24,10 @@ class Board{
 			"P_QUEEN",
 			"P_KING"
 		};
+		
+		// Attack set generation	
+		void knightAttackSetGeneration();
+		void kingAttackSetGeneration();
 	public:
 		
 		Board(void);
@@ -47,11 +52,12 @@ class Board{
 		// location offsets  
 		enum RayDirections{
 			N = 8,
-			NE = 1,
-			SE = -7,
-			S = -8,
-			SW = -9,
-			W = -1,
+			NE = 9,
+			E = 1,
+			SE = 7,
+			S = 8,
+			SW = 9,
+			W = 1,
 			NW =7,
 		};
 
@@ -61,10 +67,10 @@ class Board{
 			NNW = 15,
 			NNE = 17,
 			NEE = 10,
-			SEE = -6,
-			SSE = -15,
-			SSW = -17,
-			SWW = -10,
+			SEE = 6,
+			SSE = 15,
+			SSW = 17,
+			SWW = 10,
 		   	NWW = 6,	
 		};
 
@@ -80,6 +86,9 @@ class Board{
 		static const u_int64 DARK_SQUARES =     	0xAA55AA55AA55AA55;
 		static const u_int64 NOT_A_FILE = 			0xfefefefefefefefe;
 		static const u_int64 NOT_H_FILE = 			0x7f7f7f7f7f7f7f7f;
+		static const u_int64 NOT_AB_FILE = ~(AFILE | (AFILE << 1));
+		static const u_int64 NOT_GH_FILE = ~(HFILE | (HFILE >> 1));
+
 		// NOTE: we are using Little Endian Rank-File Mappings 	
 		enum SquarePos{
 			A1, B1, C1, D1, E1, F1, G1, H1,
@@ -92,6 +101,13 @@ class Board{
 		  	A8, B8, C8, D8, E8, F8, G8, H8
 		};		
 		
+		// ATTACK SETS -- FOR KNIGHT AND KING, THESEARE INDEXED BY POSITION OF THE KING i.e 0..63 -> A1..H8.	
+		// e.g. knightAttackSet[Board::A1]
+		// KNIGHT ATTACK DICTIONARY 
+		u_int64 *knightAttackSet;	
+
+		// KING ATTACK DICTIONARY 
+		u_int64 *kingAttackSet;
 		/*
 		 * METHODS ON THE BOARD 
 		 */
@@ -148,6 +164,15 @@ class Board{
 		u_int64 tSouthEast(u_int64 bb);
 		u_int64 tSouthWest(u_int64 bb);
 
+		u_int64 tNNE(u_int64 bb);
+		u_int64 tNEE(u_int64 bb);
+		u_int64 tSEE(u_int64 bb);
+		u_int64 tSSE(u_int64 bb);
+		u_int64 tNNW(u_int64 bb);
+		u_int64 tNWW(u_int64 bb);
+		u_int64 tSWW(u_int64 bb);
+		u_int64 tSSW(u_int64 bb);
+
 		// PAWN MOVES
 		u_int64 wSinglePawnPushDest();			
 		u_int64 bSinglePawnPushDest();			
@@ -181,4 +206,38 @@ class Board{
 		u_int64 bPawnCaptureEast();
 		u_int64 bPawnCaptureWest();
 		u_int64 bPawnCaptureAll();
+		
+
+		// King and Knight Captures 
+		u_int64 bKingCaptureEast();
+		u_int64 bKingCaptureWest();
+		u_int64 bKingCaptureNorth();
+		u_int64 bKingCaptureSouth();
+		u_int64 bKingCaptureAll();
+
+		u_int64 wKingCaptureEast();
+		u_int64 wKingCaptureWest();
+		u_int64 wKingCaptureNorth();
+		u_int64 wKingCaptureSouth();
+		u_int64 wKingCaptureAll();
+
+		u_int64 bKnightCaptureEast();
+		u_int64 bKnightCaptureWest();
+		u_int64 bKnightCaptureNorth();
+		u_int64 bKnightCaptureSouth();
+		u_int64 bKnightCaptureAll();
+
+		u_int64 wKnightCaptureEast();
+		u_int64 wKnightCaptureWest();
+		u_int64 wKnightCaptureNorth();
+		u_int64 wKnightCaptureSouth();
+		u_int64 wKnightCaptureAll();
+
+		u_int64 wKingCaptureMap();
+		u_int64	bKingCaptureMap(); 
+		u_int64 wKnightCaptureMap();
+		u_int64	bKnightCaptureMap(); 
+		// clean up methods 
+		void deleteStructures();
+		
 };

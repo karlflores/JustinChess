@@ -29,7 +29,10 @@ Board::Board(){
 	pieceBB[P_QUEEN] = 0L | 1L << (D1) | 1L << (D8); 
 	//P_KING	
 	pieceBB[P_KING] = 0L | 1L << (E1) | 1L << (E8); 
-	
+
+	// populate the pieceDict	
+	knightAttackSetGeneration();
+	kingAttackSetGeneration();
 }
 
 // test functions on the board
@@ -124,39 +127,69 @@ u_int64 Board::getEmptySquares(){
 	return ~(pieceBB[P_WHITE] | pieceBB[P_BLACK]);
 }
 
+// Clean up
+
+void Board::deleteStructures(){
+	delete(kingAttackSet);
+	delete(knightAttackSet);
+}
 //Board Transformations 
 
 u_int64 Board::tNorth(u_int64 bb){
-	return bb << 8;
+	return bb << Board::N;
 }
 
 u_int64 Board::tSouth(u_int64 bb){
-	return bb >> 8;
+	return bb >> Board::S;
 }
 
 u_int64 Board::tEast(u_int64 bb){
-	return (bb << 1) & Board::NOT_A_FILE; 
+	return (bb << Board::E) & Board::NOT_A_FILE; 
 }
 
 u_int64 Board::tWest(u_int64 bb){
-	return (bb >> 1) & Board::NOT_H_FILE;
+	return (bb >> Board::W) & Board::NOT_H_FILE;
 }
 
 u_int64 Board::tNorthEast(u_int64 bb){
-	return (bb << 9) & Board::NOT_A_FILE;
+	return (bb << Board::NE) & Board::NOT_A_FILE;
 }
 
 u_int64 Board::tNorthWest(u_int64 bb){
-	return (bb << 7 ) & Board::NOT_H_FILE;
+	return (bb << Board::NW) & Board::NOT_H_FILE;
 }
 
 u_int64 Board::tSouthEast(u_int64 bb){
-	return (bb >> 7) & Board::NOT_A_FILE;
-
+	return (bb >> Board::SE) & Board::NOT_A_FILE;
 }
 
 u_int64 Board::tSouthWest(u_int64 bb){
-	return (bb >> 9 ) & Board::NOT_H_FILE;
+	return (bb >> Board::SW) & Board::NOT_H_FILE;
+}
+
+u_int64 Board::tNNE(u_int64 bb){
+	return (bb << Board::NNE) & Board::NOT_A_FILE;
+}
+u_int64 Board::tNEE(u_int64 bb){
+	return (bb << Board::NEE) & Board::NOT_AB_FILE;
+}
+u_int64 Board::tSEE(u_int64 bb){
+	return (bb >> Board::SEE) & Board::NOT_AB_FILE;
+}
+u_int64 Board::tSSE(u_int64 bb){
+	return (bb >> Board::SSE) & Board::NOT_A_FILE;
+}
+u_int64 Board::tNNW(u_int64 bb){
+	return (bb << Board::NNW) & Board::NOT_H_FILE;
+}
+u_int64 Board::tNWW(u_int64 bb){
+	return (bb << Board::NWW) & Board::NOT_GH_FILE;
+}
+u_int64 Board::tSWW(u_int64 bb){
+	return (bb >> Board::SWW) & Board::NOT_GH_FILE;
+}
+u_int64 Board::tSSW(u_int64 bb){
+	return (bb >> Board::SSW) & Board::NOT_H_FILE;
 }
 
 // Pawn movements 
@@ -171,7 +204,6 @@ u_int64 Board::bSinglePawnPushDest(){
 	// shift the board down by one rank
 	return tSouth(getPieceSet(P_PAWN,P_BLACK)) & getEmptySquares();
 }
-
 
 u_int64 Board::wDoublePawnPushDest(){
 	u_int64 RANK4 = RANK1 << 8*3;
@@ -278,3 +310,43 @@ u_int64 Board::bPawnCaptureWest(){
 u_int64 Board::bPawnCaptureAll(){
 	return getPieceSet(P_PAWN,P_BLACK) & wPawnAllAttacks();
 }
+
+// Knight Dict Generation
+void Board::knightAttackSetGeneration(){
+
+	knightAttackSet = new u_int64[64];
+
+	u_int64 start = 1L;
+	u_int64 currKnight;
+	for(int i = Board::A1 ; i <= Board::H8 ; i++){
+		currKnight = start << i;
+
+		Board::knightAttackSet[i] = tNNW(currKnight) | 
+									 tNNE(currKnight) | 
+									 tNEE(currKnight) |	
+									 tSEE(currKnight) | 
+									 tSSE(currKnight) |
+									 tSSW(currKnight) |
+									 tSWW(currKnight) |
+									 tNWW(currKnight); 
+	}
+}
+
+// King Attack Set Generation
+void Board::kingAttackSetGeneration(){
+	kingAttackSet = new u_int64[64];
+	
+	u_int64 start = 1L;
+	u_int64 currKing;
+
+	for(int i = Board::A1 ; i <= Board::H8 ; i++){
+		currKing = start << i;
+		kingAttackSet[i] = 	tNorth(currKing) |
+							tSouth(currKing) |
+							tWest(currKing)  |
+							tEast(currKing);
+
+	}		
+}
+
+// King and Knight Captures
