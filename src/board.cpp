@@ -12,14 +12,14 @@ using namespace std;
 // Constructor 
 Board::Board(){
 	// set the initial positions of each piece 
-	pieceBB[P_WHITE] = Board::RANK1 | (Board::RANK1 << 8) ;
-	pieceBB[P_BLACK] = (Board::RANK8 >> 8) | Board::RANK8;	
+	pieceBB[P_WHITE] = RANK1 | (RANK1 << 8) ;
+	pieceBB[P_BLACK] = (RANK8 >> 8) | RANK8;	
 
 	// now for each of the pieces -- here we are bitshifting by the 
 	// actual square position on the board 
 	
 	//P_PAWN
-	pieceBB[P_PAWN] = (Board::RANK1 << 8) | (Board::RANK8 >> 8);	
+	pieceBB[P_PAWN] = (RANK1 << 8) | (RANK8 >> 8);	
 	//P_KNIGHT
 	pieceBB[P_KNIGHT] = 0L | 1L << (B1) | 1L << (G1) | 1L << (G8) | 1L << (B8);
 	//P_BISHOP
@@ -61,7 +61,7 @@ void Board::setBoard(PieceType pt, u_int64 board){
 // print the board in a logical manner 
 void Board::printBitBoard(PieceType pt){
 	int boardWidth = 8;
-	cout << "BOARD: [" << pt_name(pt) << "]\n";
+	cout << "BOARD: [" << ptString(pt) << "]\n";
 
 	// print the bit board in an 8 x 8 grid that mirrors the file rank system 
 	// of chess
@@ -122,8 +122,8 @@ Board Board::copy(){
 }
 
 // get the name of the piece type enum for printing
-string Board::pt_name(PieceType pt){
-	return pt_names[pt];
+string Board::ptString(PieceType pt){
+	return PT_STRINGS[pt];
 }
 
 u_int64 Board::getEmptySquares(){
@@ -179,61 +179,61 @@ int Board::bitScanReverse(u_int64 bb) {
 
 // All the following are one step transformations 
 u_int64 Board::tNorth(u_int64 bb){
-	return bb << Board::N;
+	return bb << N;
 }
 
 u_int64 Board::tSouth(u_int64 bb){
-	return bb >> abs(abs(Board::S));
+	return bb >> abs(abs(S));
 }
 
 u_int64 Board::tEast(u_int64 bb){
-	return (bb << Board::E) & Board::NOT_A_FILE; 
+	return (bb << E) & NOT_A_FILE; 
 }
 
 u_int64 Board::tWest(u_int64 bb){
-	return (bb >> abs(Board::W)) & Board::NOT_H_FILE;
+	return (bb >> abs(W)) & NOT_H_FILE;
 }
 
 u_int64 Board::tNorthEast(u_int64 bb){
-	return (bb << Board::NE) & Board::NOT_A_FILE;
+	return (bb << NE) & NOT_A_FILE;
 }
 
 u_int64 Board::tNorthWest(u_int64 bb){
-	return (bb << Board::NW) & Board::NOT_H_FILE;
+	return (bb << NW) & NOT_H_FILE;
 }
 
 u_int64 Board::tSouthEast(u_int64 bb){
-	return (bb >> abs(Board::SE)) & Board::NOT_A_FILE;
+	return (bb >> abs(SE)) & NOT_A_FILE;
 }
 
 u_int64 Board::tSouthWest(u_int64 bb){
-	return (bb >> abs(Board::SW)) & Board::NOT_H_FILE;
+	return (bb >> abs(SW)) & NOT_H_FILE;
 }
 
 // For knight movement generation
 u_int64 Board::tNNE(u_int64 bb){
-	return (bb << Board::NNE) & Board::NOT_A_FILE;
+	return (bb << NNE) & NOT_A_FILE;
 }
 u_int64 Board::tNEE(u_int64 bb){
-	return (bb << Board::NEE) & Board::NOT_AB_FILE;
+	return (bb << NEE) & NOT_AB_FILE;
 }
 u_int64 Board::tSEE(u_int64 bb){
-	return (bb >> Board::SEE) & Board::NOT_AB_FILE;
+	return (bb >> abs(SEE)) & NOT_AB_FILE;
 }
 u_int64 Board::tSSE(u_int64 bb){
-	return (bb >> Board::SSE) & Board::NOT_A_FILE;
+	return (bb >> abs(SSE)) & NOT_A_FILE;
 }
 u_int64 Board::tNNW(u_int64 bb){
-	return (bb << Board::NNW) & Board::NOT_H_FILE;
+	return (bb << NNW) & NOT_H_FILE;
 }
 u_int64 Board::tNWW(u_int64 bb){
-	return (bb << Board::NWW) & Board::NOT_GH_FILE;
+	return (bb << NWW) & NOT_GH_FILE;
 }
 u_int64 Board::tSWW(u_int64 bb){
-	return (bb >> Board::SWW) & Board::NOT_GH_FILE;
+	return (bb >> abs(SWW)) & NOT_GH_FILE;
 }
 u_int64 Board::tSSW(u_int64 bb){
-	return (bb >> Board::SSW) & Board::NOT_H_FILE;
+	return (bb >> abs(SSW)) & NOT_H_FILE;
 }
 
 // Pawn movements 
@@ -366,17 +366,17 @@ void Board::knightAttackSetGeneration(){
 
 	u_int64 start = 1L;
 	u_int64 currKnight;
-	for(int i = Board::A1 ; i <= Board::H8 ; i++){
+	for(int i = A1 ; i <= H8 ; i++){
 		currKnight = start << i;
 
-		Board::knightAttackSet[i] = tNNW(currKnight) | 
-									tNNE(currKnight) | 
-									tNEE(currKnight) |	
-									tSEE(currKnight) | 
-									tSSE(currKnight) |
-									tSSW(currKnight) |
-									tSWW(currKnight) |
-									tNWW(currKnight); 
+		knightAttackSet[i] = tNNW(currKnight) |	
+							 tNNE(currKnight) | 
+							 tNEE(currKnight) |	
+							 tSEE(currKnight) | 
+							 tSSE(currKnight) |
+							 tSSW(currKnight) |
+							 tSWW(currKnight) |
+							 tNWW(currKnight); 
 	}
 }
 
@@ -387,7 +387,7 @@ void Board::kingAttackSetGeneration(){
 	u_int64 start = 1L;
 	u_int64 currKing;
 
-	for(int i = Board::A1 ; i <= Board::H8 ; i++){
+	for(int i = A1 ; i <= H8 ; i++){
 		currKing = start << i;
 		kingAttackSet[i] = 	tNorth(currKing)|
 							tSouth(currKing)|
@@ -476,7 +476,7 @@ u_int64 Board::antiDiagonalAttackMask(int pos){
 	return (ANTIDIAGONAL >> south) << north;
 }
 
-u_int64 Board::getLineAttack(RayDirections dir, SquarePos pos){
+u_int64 Board::getLineAttack(Direction dir, SquarePos pos){
 	u_int64 lineAttack;
 	switch(dir){
 		case N:
@@ -515,12 +515,12 @@ u_int64 Board::getNegativeRay(u_int64 lineAttack, SquarePos pos){
 
 // Get a particular ray give a position and a direction -- this is 
 // used to find the sliding attacks of the queen, bishop and rook
-u_int64 Board::getRay(RayDirections dir, SquarePos pos){
+u_int64 Board::getRay(Direction dir, SquarePos pos){
 	// switch on direction 
 	u_int64 lineAttack = getLineAttack(dir, pos);
 	// switch on the direction --> return positive ray or negative 
 	// ray depending on the direction --> this is indicated by the 
-	// RayDirections ENUM
+	// Direction ENUM
 	switch(dir){
 		case N:
 		case E:
@@ -533,14 +533,12 @@ u_int64 Board::getRay(RayDirections dir, SquarePos pos){
 		case SW:
 			return getNegativeRay(lineAttack, pos);
 		default:
-
-			cout << " getRay WHYYYYYYYY\n";
 			return -1;
 	}
 }
 
 // RAY ATTACK GENERATION 
-u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
+u_int64 Board::getPositiveRayAttacks(Direction dir, SquarePos pos){
 	u_int64 ray;
 	u_int64 occupied = pieceBB[P_WHITE] | pieceBB[P_BLACK];
 
@@ -553,7 +551,6 @@ u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
 			break;
 			// TODO - ERROR HANDLING HERE 
 		default:
-			cout << " + WHYYYYYYYY\n";
 			return -1;
 	}
 	int blockerPos;	
@@ -568,8 +565,7 @@ u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
 	return attacks;
 }
 
-u_int64 Board::getNegativeRayAttacks(RayDirections dir, SquarePos pos){
-	cout << dir << "\n";
+u_int64 Board::getNegativeRayAttacks(Direction dir, SquarePos pos){
 	u_int64 ray;
 	u_int64 occupied = pieceBB[P_WHITE] | pieceBB[P_BLACK];
 	// this only will work with the following directions
@@ -582,7 +578,6 @@ u_int64 Board::getNegativeRayAttacks(RayDirections dir, SquarePos pos){
 			ray = getRay(dir,pos);
 			break;
 		default:
-			cout << " - WHYYYYYYYY\n";
 			// TODO - ERROR HANDLING HERE 
 			return -1;
 	}
@@ -600,19 +595,17 @@ u_int64 Board::getNegativeRayAttacks(RayDirections dir, SquarePos pos){
 
 // wrapper function for getPos and getNeg rau attacks -- this allows us to just 
 // get the ray attacks without having to deal with the positive and negative
-u_int64 Board::getRayAttacks(RayDirections dir, SquarePos pos){
+u_int64 Board::getRayAttacks(Direction dir, SquarePos pos){
 	switch(dir){
 		case N:
 		case E:
 		case NW:
 		case NE:
-			cout << "CHOSE POSITIVE\n";
 			return getPositiveRayAttacks(dir, pos);
 		case S:
 		case W:
 		case SE:
 		case SW:
-			cout << "CHOSE NEGATIVE\n";
 			return getNegativeRayAttacks(dir, pos);
 		default:
 			cout << "WHYYYYYYYY\n";
@@ -649,3 +642,6 @@ u_int64 Board::getQueenAttacks(SquarePos pos){
 		   getRayAttacks(SW,pos) | 
 		   getRayAttacks(NW,pos);
 }
+
+// OTHER HELPTER METHODS 
+
