@@ -393,10 +393,10 @@ void Board::kingAttackSetGeneration(){
 							tSouth(currKing)|
 							tWest(currKing) |
 							tEast(currKing) |
-						    tNorthWest(currKing)|
-							tNorthEast(currKing)|
-							tSouthWest(currKing)|
-							tSouthEast(currKing);	
+						tNorthWest(currKing)|
+						tNorthEast(currKing)|
+						tSouthWest(currKing)|
+						tSouthEast(currKing);	
 
 	}		
 }
