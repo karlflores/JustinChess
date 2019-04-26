@@ -389,14 +389,10 @@ void Board::kingAttackSetGeneration(){
 
 	for(int i = A1 ; i <= H8 ; i++){
 		currKing = start << i;
-		kingAttackSet[i] = 	tNorth(currKing)|
-							tSouth(currKing)|
-							tWest(currKing) |
-							tEast(currKing) |
-						tNorthWest(currKing)|
-						tNorthEast(currKing)|
-						tSouthWest(currKing)|
-						tSouthEast(currKing);	
+		kingAttackSet[i] = 	tNorth(currKing)| tSouth(currKing)| 
+					 tWest(currKing) | tEast(currKing) |
+				tNorthWest(currKing) | tNorthEast(currKing)|
+				tSouthWest(currKing) | tSouthEast(currKing);	
 
 	}		
 }
