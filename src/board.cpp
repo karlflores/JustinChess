@@ -15,8 +15,8 @@ Board::Board(){
 	pieceBB[P_WHITE] = Board::RANK1 | (Board::RANK1 << 8) ;
 	pieceBB[P_BLACK] = (Board::RANK8 >> 8) | Board::RANK8;	
 
-	// now for each of the pieces -- here we are bitshifting by the actual square position 
-	// on the board 
+	// now for each of the pieces -- here we are bitshifting by the 
+	// actual square position on the board 
 	
 	//P_PAWN
 	pieceBB[P_PAWN] = (Board::RANK1 << 8) | (Board::RANK8 >> 8);	
@@ -85,7 +85,8 @@ bool Board::containsPiece(PieceType pt, SquarePos pos){
 	return (pieceBB[pt] & (getMovingMask(pos))) > 0; 	
 }
 
-// helper function for the movePiece method -> moving a piece from one location to another 
+// helper function for the movePiece method -> moving a 
+// piece from one location to another 
 u_int64 Board::getMovingMask(SquarePos pos){
 
 	return 1L << pos;
@@ -464,7 +465,9 @@ u_int64 Board::diagonalAttackMask(int pos){
 	return (DIAGONAL >> south) << north;
 }
 
-u_int64 Board::antiDiagonalAttackMask(int pos){ // code from chessprogramming.net 
+u_int64 Board::antiDiagonalAttackMask(int pos){ 
+		
+	// code from chessprogramming.net 
 	
 	int diag = 56 - 8*(pos & 7) - (pos & 56);
 	int north = -diag & (diag >> 31);
@@ -510,13 +513,14 @@ u_int64 Board::getNegativeRay(u_int64 lineAttack, SquarePos pos){
 	return lineAttack & (((u_int64)1 << pos) - 1);	
 }
 
-// Get a particular ray give a position and a direction -- this is used to find the 
-// sliding attacks of the queen, bishop and rook
+// Get a particular ray give a position and a direction -- this is 
+// used to find the sliding attacks of the queen, bishop and rook
 u_int64 Board::getRay(RayDirections dir, SquarePos pos){
 	// switch on direction 
 	u_int64 lineAttack = getLineAttack(dir, pos);
-	// switch on the direction --> return positive ray or negative ray depending on the 
-	// direction --> this is indicated by the RayDirections ENUM
+	// switch on the direction --> return positive ray or negative 
+	// ray depending on the direction --> this is indicated by the 
+	// RayDirections ENUM
 	switch(dir){
 		case N:
 		case E:
@@ -529,10 +533,13 @@ u_int64 Board::getRay(RayDirections dir, SquarePos pos){
 		case SW:
 			return getNegativeRay(lineAttack, pos);
 		default:
+
+			cout << " getRay WHYYYYYYYY\n";
 			return -1;
 	}
 }
 
+// RAY ATTACK GENERATION 
 u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
 	u_int64 ray;
 	u_int64 occupied = pieceBB[P_WHITE] | pieceBB[P_BLACK];
@@ -542,9 +549,11 @@ u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
 		case E:
 		case NE:
 		case NW:
-			// TODO - ERROR HANDLING HERE 
 			ray = getRay(dir,pos);
+			break;
+			// TODO - ERROR HANDLING HERE 
 		default:
+			cout << " + WHYYYYYYYY\n";
 			return -1;
 	}
 	int blockerPos;	
@@ -560,6 +569,7 @@ u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
 }
 
 u_int64 Board::getNegativeRayAttacks(RayDirections dir, SquarePos pos){
+	cout << dir << "\n";
 	u_int64 ray;
 	u_int64 occupied = pieceBB[P_WHITE] | pieceBB[P_BLACK];
 	// this only will work with the following directions
@@ -570,7 +580,9 @@ u_int64 Board::getNegativeRayAttacks(RayDirections dir, SquarePos pos){
 		case SW:
 		case W:
 			ray = getRay(dir,pos);
+			break;
 		default:
+			cout << " - WHYYYYYYYY\n";
 			// TODO - ERROR HANDLING HERE 
 			return -1;
 	}
@@ -594,13 +606,16 @@ u_int64 Board::getRayAttacks(RayDirections dir, SquarePos pos){
 		case E:
 		case NW:
 		case NE:
+			cout << "CHOSE POSITIVE\n";
 			return getPositiveRayAttacks(dir, pos);
 		case S:
 		case W:
 		case SE:
 		case SW:
+			cout << "CHOSE NEGATIVE\n";
 			return getNegativeRayAttacks(dir, pos);
 		default:
+			cout << "WHYYYYYYYY\n";
 			return -1;
 	}
 	

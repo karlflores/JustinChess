@@ -65,7 +65,9 @@ int main(){
 	}
 	board.setBoard(board.P_KNIGHT,Board::NOT_A_FILE);
 	board.printBitBoard(board.P_KNIGHT);
-	board.setBoard(board.P_KNIGHT,board.getRay(board.S,Board::C4));
+
+	board = Board();
+	board.setBoard(board.P_KNIGHT,board.getQueenAttacks(Board::E3));
 	board.printBitBoard(board.P_KNIGHT);
 		
 	board.deleteStructures();
