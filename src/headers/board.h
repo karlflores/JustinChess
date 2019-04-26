@@ -45,12 +45,12 @@ const string PT_STRINGS[] =
 {
 	"WHITE",
 	"BLACK",
-	"P_PAWN",
-	"P_KNIGHT",
-	"P_BISHOP",
-	"P_ROOK",
-	"P_QUEEN",
-	"P_KING"
+	"PAWN",
+	"KNIGHT",
+	"BISHOP",
+	"ROOK",
+	"QUEEN",
+	"KING"
 };
 
 enum ColourType{
@@ -115,7 +115,7 @@ enum SquarePos{
 	A8, B8, C8, D8, E8, F8, G8, H8
 };		
 
-const string SquarePosString[]{
+const string POS_STRING[]{
 	"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
 	"A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
 	"A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",
@@ -127,7 +127,7 @@ const string SquarePosString[]{
 };		
 
 // FOR DEBRUJIN BITSCAN ALGORITHM 
-const int bitscanIndex64[] = {
+const int BITSCAN_INDEX64[] = {
 	0, 47,  1, 56, 48, 27,  2, 60,
 	57, 49, 41, 37, 28, 16,  3, 61,
 	54, 58, 35, 52, 50, 42, 21, 44,
@@ -218,7 +218,6 @@ class Board{
 		// copy board
 		Board copy();
 
-		string ptString(PieceType pt);
 		
 		// Board transformations 
 
@@ -298,5 +297,10 @@ class Board{
 		u_int64 getRayAttacks(Direction dir, SquarePos pos);	
 
 		// other helper methods 
-		Direction strToDirection(string dir);
+		static Direction strToDirection(string dir);
+		static SquarePos strToPosition(string pos);
+		static PieceType strToPieceType(string pos);
+		static string directionToStr(Direction dir);
+		static string positionToStr(SquarePos pos);	
+		static string pieceTypeToStr(PieceType pt);
 };

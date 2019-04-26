@@ -61,18 +61,21 @@ void Board::setBoard(PieceType pt, u_int64 board){
 // print the board in a logical manner 
 void Board::printBitBoard(PieceType pt){
 	int boardWidth = 8;
-	cout << "BOARD: [" << ptString(pt) << "]\n";
+	cout << "BOARD: [" << pieceTypeToStr(pt) << "]\n";
 
 	// print the bit board in an 8 x 8 grid that mirrors the file rank system 
 	// of chess
 	for(int rank = boardWidth-1; rank >= 0 ; rank--){
+		cout << rank+1 << "|";
 		for(int file = 0; file < 8 ; file ++){
-			cout << containsPiece(pt, static_cast<SquarePos>(rank*boardWidth + file));
+			cout << (containsPiece(pt, static_cast<SquarePos>(rank*boardWidth + file)) ? "x" : ".");
 			cout << " ";
 		}
 		cout << "\n";
 
 	}	
+	cout << "+-+-+-+-+-+-+-+-+\n";
+	cout << "  A B C D E F G H\n";
 }
 
 // returns true if a square at a given location is occupied 
@@ -122,7 +125,7 @@ Board Board::copy(){
 }
 
 // get the name of the piece type enum for printing
-string Board::ptString(PieceType pt){
+string Board::pieceTypeToStr(PieceType pt){
 	return PT_STRINGS[pt];
 }
 
@@ -152,7 +155,7 @@ void Board::deleteStructures(){
 int Board::bitScanForward(u_int64 bb){
 	assert(bb != 0);
 
-	return bitscanIndex64[((bb ^ (bb-1)) * DEBRUIJN64) >> 58]; 
+	return BITSCAN_INDEX64[((bb ^ (bb-1)) * DEBRUIJN64) >> 58]; 
 }
 
 /**
@@ -172,7 +175,7 @@ int Board::bitScanReverse(u_int64 bb) {
    bb |= bb >> 16;
    bb |= bb >> 32;
 
-   return bitscanIndex64[(bb * DEBRUIJN64) >> 58];
+   return BITSCAN_INDEX64[(bb * DEBRUIJN64) >> 58];
 }
 
 //Board Transformations 
@@ -640,4 +643,49 @@ u_int64 Board::getQueenAttacks(SquarePos pos){
 }
 
 // OTHER HELPTER METHODS 
+Direction Board::strToDirection(string dir){
+	if(dir.compare("N")==0) return N;
+	else if(dir.compare("S")==0) return S;
+	else if(dir.compare("W")==0) return W;
+	else if(dir.compare("E")==0) return E;
+	else if(dir.compare("NW")==0) return NW;
+	else if(dir.compare("NE")==0) return NE;
+	else if(dir.compare("SW")==0) return SW;
+	else if(dir.compare("SE")==0) return SE;
+	else if(dir.compare("NNW")==0) return NNW;
+	else if(dir.compare("NNE")==0) return NNE;
+	else if(dir.compare("NEE")==0) return NEE;
+	else if(dir.compare("NWW")==0) return NWW;
+	else if(dir.compare("SEE")==0) return SEE;
+	else if(dir.compare("SSE")==0) return SSE;
+	else if(dir.compare("SWW")==0) return SWW;
+	else return SSW; 
+}
 
+SquarePos Board::strToPosition(string pos){
+	assert(pos.length() == 2); 
+	// get the rank and pos from the string
+	char file = pos[0];
+	int rank = pos[1] - '0';
+
+	return static_cast<SquarePos>((rank - 1)*8 + (file - 'A')); 
+}
+
+string Board::positionToStr(SquarePos pos){
+	return POS_STRING[pos];
+}
+
+string Board::directionToStr(Direction dir){
+	return DIR_STR_DICT.at(dir);
+}
+
+PieceType Board::strToPieceType(string pt){
+	if(pt.compare("WHITE") == 0) return P_WHITE;
+	if(pt.compare("BLACK") == 0) return P_BLACK;
+	if(pt.compare("PAWN") == 0) return P_PAWN;
+	if(pt.compare("ROOK") == 0) return P_ROOK;
+	if(pt.compare("KNIGHT") == 0) return P_KNIGHT;
+	if(pt.compare("BISHOP") == 0) return P_BISHOP;
+	if(pt.compare("KING") == 0) return P_KING;
+	return P_QUEEN;
+}
