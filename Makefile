@@ -1,5 +1,5 @@
 PROG = bin/board 
-CC = g++
+CC = g++ 
 
 CPPFLAGS = -g -Wall -std=c++11
 OBJS = board.o main.o

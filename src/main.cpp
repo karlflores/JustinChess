@@ -65,10 +65,9 @@ int main(){
 	}
 	board.setBoard(board.P_KNIGHT,Board::NOT_A_FILE);
 	board.printBitBoard(board.P_KNIGHT);
-	board.setBoard(board.P_KNIGHT,Board::NOT_H_FILE);
+	board.setBoard(board.P_KNIGHT,board.getRay(board.S,Board::C4));
 	board.printBitBoard(board.P_KNIGHT);
-	
-
+		
 	board.deleteStructures();
 	return 0;
 }

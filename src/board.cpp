@@ -34,6 +34,7 @@ Board::Board(){
 	// populate the pieceDict	
 	knightAttackSetGeneration();
 	kingAttackSetGeneration();
+	lineAttackGeneration();
 }
 
 // test functions on the board
@@ -133,15 +134,55 @@ u_int64 Board::getEmptySquares(){
 void Board::deleteStructures(){
 	delete(kingAttackSet);
 	delete(knightAttackSet);
+	delete(fileAttackSet);
+	delete(rankAttackSet);
+	delete(diagonalAttackSet);
+	delete(antiDiagonalAttackSet);
 }
+
+// Helper methods
+/**
+ * bitScanForward
+ * @author Kim Walisch (2012)
+ * @param bb bitboard to scan
+ * @precondition bb != 0
+ * @return index (0..63) of least significant one bit
+ */ 
+int Board::bitScanForward(u_int64 bb){
+	assert(bb != 0);
+
+	return bitscanIndex64[((bb ^ (bb-1)) * DEBRUIJN64) >> 58]; 
+}
+
+/**
+ * bitScanReverse
+ * @authors Kim Walisch, Mark Dickinson
+ * @param bb bitboard to scan
+ * @precondition bb != 0
+ * @return index (0..63) of most significant one bit
+ */
+int Board::bitScanReverse(u_int64 bb) {
+   assert(bb != 0);
+
+   bb |= bb >> 1;
+   bb |= bb >> 2;
+   bb |= bb >> 4;
+   bb |= bb >> 8;
+   bb |= bb >> 16;
+   bb |= bb >> 32;
+
+   return bitscanIndex64[(bb * DEBRUIJN64) >> 58];
+}
+
 //Board Transformations 
 
+// All the following are one step transformations 
 u_int64 Board::tNorth(u_int64 bb){
 	return bb << Board::N;
 }
 
 u_int64 Board::tSouth(u_int64 bb){
-	return bb >> Board::S;
+	return bb >> abs(abs(Board::S));
 }
 
 u_int64 Board::tEast(u_int64 bb){
@@ -149,7 +190,7 @@ u_int64 Board::tEast(u_int64 bb){
 }
 
 u_int64 Board::tWest(u_int64 bb){
-	return (bb >> Board::W) & Board::NOT_H_FILE;
+	return (bb >> abs(Board::W)) & Board::NOT_H_FILE;
 }
 
 u_int64 Board::tNorthEast(u_int64 bb){
@@ -161,13 +202,14 @@ u_int64 Board::tNorthWest(u_int64 bb){
 }
 
 u_int64 Board::tSouthEast(u_int64 bb){
-	return (bb >> Board::SE) & Board::NOT_A_FILE;
+	return (bb >> abs(Board::SE)) & Board::NOT_A_FILE;
 }
 
 u_int64 Board::tSouthWest(u_int64 bb){
-	return (bb >> Board::SW) & Board::NOT_H_FILE;
+	return (bb >> abs(Board::SW)) & Board::NOT_H_FILE;
 }
 
+// For knight movement generation
 u_int64 Board::tNNE(u_int64 bb){
 	return (bb << Board::NNE) & Board::NOT_A_FILE;
 }
@@ -312,6 +354,10 @@ u_int64 Board::bPawnCaptureAll(){
 	return getPieceSet(P_PAWN,P_BLACK) & wPawnAllAttacks();
 }
 
+/*
+ * KNIGHT AND KING MOVE GENERATION
+ */
+
 // Knight Dict Generation
 void Board::knightAttackSetGeneration(){
 
@@ -342,12 +388,249 @@ void Board::kingAttackSetGeneration(){
 
 	for(int i = Board::A1 ; i <= Board::H8 ; i++){
 		currKing = start << i;
-		kingAttackSet[i] = 	tNorth(currKing) |
-							tSouth(currKing) |
-							tWest(currKing)  |
-							tEast(currKing);
+		kingAttackSet[i] = 	tNorth(currKing)|
+							tSouth(currKing)|
+							tWest(currKing) |
+							tEast(currKing) |
+						    tNorthWest(currKing)|
+							tNorthEast(currKing)|
+							tSouthWest(currKing)|
+							tSouthEast(currKing);	
 
 	}		
 }
+// populate the line attacks 
+void Board::lineAttackGeneration(){
+	fileAttackSet = new u_int64[64];
+	rankAttackSet = new u_int64[64];
+	diagonalAttackSet = new u_int64[64];
+	antiDiagonalAttackSet = new u_int64[64];
 
+	for(int pos = A1; pos <= H8 ; pos++){
+		fileAttackSet[pos] = fileAttackMask(pos);
+		rankAttackSet[pos] = rankAttackMask(pos);
+		diagonalAttackSet[pos] = diagonalAttackMask(pos);
+		antiDiagonalAttackSet[pos] = antiDiagonalAttackMask(pos);
+
+	}
+}
 // King and Knight Captures
+u_int64 Board::wKingCaptureMap(){
+	u_int64 king = pieceBB[P_KING] & pieceBB[P_WHITE];
+	if(king == 0L)
+			return king;
+	return kingAttackSet[bitScanForward(king)] & pieceBB[P_BLACK];
+}
+// King and Knight Captures
+u_int64 Board::bKingCaptureMap(){
+	u_int64 king = pieceBB[P_KING] & pieceBB[P_BLACK];
+	if(king == 0L)
+			return king;
+	return kingAttackSet[bitScanForward(king)] & pieceBB[P_WHITE];
+}
+
+u_int64 Board::wKnightCaptureMap(){
+	u_int64 king = pieceBB[P_KNIGHT] & pieceBB[P_WHITE];
+	if(king == 0L)
+			return king;
+	return kingAttackSet[bitScanForward(king)] & pieceBB[P_BLACK];
+}
+// King and Knight Captures
+u_int64 Board::bKnightCaptureMap(){
+	u_int64 king = pieceBB[P_KNIGHT] & pieceBB[P_BLACK];
+	if(king == 0L)
+			return king;
+	return kingAttackSet[bitScanForward(king)] & pieceBB[P_WHITE];
+}
+
+// Sliding piece generation 
+
+// Code adapted from Chess Programming.org
+u_int64 Board::rankAttackMask(int pos){
+	return RANK1 << (pos & 56);
+}
+
+u_int64 Board::fileAttackMask(int pos){
+	return AFILE << (pos & 7);
+}
+
+u_int64 Board::diagonalAttackMask(int pos){
+	// code from chessprogramming.net 
+	
+	int diag = 8*(pos & 7) - (pos & 56);
+	int north = -diag & (diag >> 31);
+	int south = diag & (-diag >> 31);
+
+	return (DIAGONAL >> south) << north;
+}
+
+u_int64 Board::antiDiagonalAttackMask(int pos){ // code from chessprogramming.net 
+	
+	int diag = 56 - 8*(pos & 7) - (pos & 56);
+	int north = -diag & (diag >> 31);
+	int south = diag & (-diag >> 31);
+
+	return (ANTIDIAGONAL >> south) << north;
+}
+
+u_int64 Board::getLineAttack(RayDirections dir, SquarePos pos){
+	u_int64 lineAttack;
+	switch(dir){
+		case N:
+		case S:
+			// this also counts as S 
+			lineAttack = fileAttackSet[pos];			
+			break;
+		case E:
+		case W:
+			// also W
+			lineAttack = rankAttackSet[pos];
+			break;
+		case NE:
+		case SW:
+			// also SW
+			lineAttack = diagonalAttackSet[pos];
+			break;
+		case SE:
+		case NW:
+			// also NW
+			lineAttack = antiDiagonalAttackSet[pos];
+			break;
+		default:
+			return -1;
+	}
+	return lineAttack;
+}
+
+u_int64 Board::getPositiveRay(u_int64 lineAttack, SquarePos pos){
+	return lineAttack & ((u_int64)-2 << pos);	
+}
+
+u_int64 Board::getNegativeRay(u_int64 lineAttack, SquarePos pos){
+	return lineAttack & (((u_int64)1 << pos) - 1);	
+}
+
+// Get a particular ray give a position and a direction -- this is used to find the 
+// sliding attacks of the queen, bishop and rook
+u_int64 Board::getRay(RayDirections dir, SquarePos pos){
+	// switch on direction 
+	u_int64 lineAttack = getLineAttack(dir, pos);
+	// switch on the direction --> return positive ray or negative ray depending on the 
+	// direction --> this is indicated by the RayDirections ENUM
+	switch(dir){
+		case N:
+		case E:
+		case NW:
+		case NE:
+			return getPositiveRay(lineAttack, pos);
+		case S:
+		case W:
+		case SE:
+		case SW:
+			return getNegativeRay(lineAttack, pos);
+		default:
+			return -1;
+	}
+}
+
+u_int64 Board::getPositiveRayAttacks(RayDirections dir, SquarePos pos){
+	u_int64 ray;
+	u_int64 occupied = pieceBB[P_WHITE] | pieceBB[P_BLACK];
+
+	switch(dir){
+		case N:
+		case E:
+		case NE:
+		case NW:
+			// TODO - ERROR HANDLING HERE 
+			ray = getRay(dir,pos);
+		default:
+			return -1;
+	}
+	int blockerPos;	
+
+	u_int64 attacks = ray;
+	u_int64 blocker = ray & occupied; 
+
+	if(blocker){
+		blockerPos = bitScanForward(blocker);
+		attacks = attacks ^ getRay(dir,static_cast<SquarePos>(blockerPos));	
+	}
+	return attacks;
+}
+
+u_int64 Board::getNegativeRayAttacks(RayDirections dir, SquarePos pos){
+	u_int64 ray;
+	u_int64 occupied = pieceBB[P_WHITE] | pieceBB[P_BLACK];
+	// this only will work with the following directions
+	// I need a way to handle errors --> need to work this out in c++
+	switch(dir){
+		case S:
+		case SE:
+		case SW:
+		case W:
+			ray = getRay(dir,pos);
+		default:
+			// TODO - ERROR HANDLING HERE 
+			return -1;
+	}
+	int blockerPos;	
+
+	u_int64 attacks = ray;
+	u_int64 blocker = ray & occupied; 
+
+	if(blocker){
+		blockerPos = bitScanReverse(blocker);
+		attacks = attacks ^ getRay(dir,static_cast<SquarePos>(blockerPos));	
+	}
+	return attacks;
+}
+
+// wrapper function for getPos and getNeg rau attacks -- this allows us to just 
+// get the ray attacks without having to deal with the positive and negative
+u_int64 Board::getRayAttacks(RayDirections dir, SquarePos pos){
+	switch(dir){
+		case N:
+		case E:
+		case NW:
+		case NE:
+			return getPositiveRayAttacks(dir, pos);
+		case S:
+		case W:
+		case SE:
+		case SW:
+			return getNegativeRayAttacks(dir, pos);
+		default:
+			return -1;
+	}
+	
+}
+
+// FINALLY the AttackSets of the Rook, Bishop and the Queen 
+// Unlike the other pieces, this requires the specific position
+// of the pawn that we are wanting to evaluate / move 
+// HERE we just concatenate the specific ray direction attacks 
+u_int64 Board::getRookAttacks(SquarePos pos){
+	return getRayAttacks(E,pos) | 
+		   getRayAttacks(W,pos) | 
+		   getRayAttacks(N,pos) | 
+		   getRayAttacks(S,pos);
+}
+
+u_int64 Board::getBishopAttacks(SquarePos pos){
+	return getRayAttacks(NE,pos) | 
+		   getRayAttacks(SE,pos) | 
+		   getRayAttacks(SW,pos) | 
+		   getRayAttacks(NW,pos);
+}
+
+u_int64 Board::getQueenAttacks(SquarePos pos){
+	return getRayAttacks(E,pos)  | 
+		   getRayAttacks(W,pos)  | 
+		   getRayAttacks(N,pos)  | 
+		   getRayAttacks(S,pos)  |
+		   getRayAttacks(NE,pos) | 
+		   getRayAttacks(SE,pos) | 
+		   getRayAttacks(SW,pos) | 
+		   getRayAttacks(NW,pos);
+}

@@ -1,4 +1,5 @@
 #include <iostream> 
+#include <cstdlib>
 #include <string> 
 #include <vector> 
 
@@ -28,6 +29,26 @@ class Board{
 		// Attack set generation	
 		void knightAttackSetGeneration();
 		void kingAttackSetGeneration();
+		
+		void lineAttackGeneration();
+		u_int64 rankAttackMask(int pos);
+		u_int64 fileAttackMask(int pos);
+		u_int64 diagonalAttackMask(int pos);
+		u_int64 antiDiagonalAttackMask(int pos);
+
+		
+		// FOR DEBRUJIN FORWARD BITSCAN 
+		int bitscanIndex64[64] = {
+    		0, 47,  1, 56, 48, 27,  2, 60,
+   			57, 49, 41, 37, 28, 16,  3, 61,
+   			54, 58, 35, 52, 50, 42, 21, 44,
+   			38, 32, 29, 23, 17, 11,  4, 62,
+   			46, 55, 26, 59, 40, 36, 15, 53,
+   			34, 51, 20, 43, 31, 22, 10, 45,
+   			25, 39, 14, 33, 19, 30,  9, 24,
+   			13, 18,  8, 12,  7,  6,  5, 63
+		};
+
 	public:
 		
 		Board(void);
@@ -45,20 +66,20 @@ class Board{
 		};
 		
 		enum ColourType{
-			white,
-			black, 	
+			WHITE,
+			BLACK, 	
 		};
 
 		// location offsets  
 		enum RayDirections{
-			N = 8,
-			NE = 9,
-			E = 1,
-			SE = 7,
-			S = 8,
-			SW = 9,
-			W = 1,
-			NW =7,
+			N =   8,
+			NE =  9,
+			E =   1,
+			SE = -7,
+			S =  -8,
+			SW = -9,
+			W =  -1,
+			NW =  7,
 		};
 
 		// knight directions 
@@ -88,6 +109,7 @@ class Board{
 		static const u_int64 NOT_H_FILE = 			0x7f7f7f7f7f7f7f7f;
 		static const u_int64 NOT_AB_FILE = ~(AFILE | (AFILE << 1));
 		static const u_int64 NOT_GH_FILE = ~(HFILE | (HFILE >> 1));
+		static const u_int64 DEBRUIJN64 = 			0x03f79d71b4cb0a89;
 
 		// NOTE: we are using Little Endian Rank-File Mappings 	
 		enum SquarePos{
@@ -108,6 +130,10 @@ class Board{
 
 		// KING ATTACK DICTIONARY 
 		u_int64 *kingAttackSet;
+		u_int64 *fileAttackSet;
+		u_int64 *rankAttackSet;
+		u_int64 *diagonalAttackSet;
+		u_int64 *antiDiagonalAttackSet;
 		/*
 		 * METHODS ON THE BOARD 
 		 */
@@ -209,35 +235,30 @@ class Board{
 		
 
 		// King and Knight Captures 
-		u_int64 bKingCaptureEast();
-		u_int64 bKingCaptureWest();
-		u_int64 bKingCaptureNorth();
-		u_int64 bKingCaptureSouth();
-		u_int64 bKingCaptureAll();
-
-		u_int64 wKingCaptureEast();
-		u_int64 wKingCaptureWest();
-		u_int64 wKingCaptureNorth();
-		u_int64 wKingCaptureSouth();
-		u_int64 wKingCaptureAll();
-
-		u_int64 bKnightCaptureEast();
-		u_int64 bKnightCaptureWest();
-		u_int64 bKnightCaptureNorth();
-		u_int64 bKnightCaptureSouth();
-		u_int64 bKnightCaptureAll();
-
-		u_int64 wKnightCaptureEast();
-		u_int64 wKnightCaptureWest();
-		u_int64 wKnightCaptureNorth();
-		u_int64 wKnightCaptureSouth();
-		u_int64 wKnightCaptureAll();
-
 		u_int64 wKingCaptureMap();
 		u_int64	bKingCaptureMap(); 
 		u_int64 wKnightCaptureMap();
 		u_int64	bKnightCaptureMap(); 
+
+		// Sliding Piece Generation 
+		u_int64 getRookAttacks(SquarePos pos);
+		u_int64 getBishopAttacks(SquarePos pos);
+		u_int64 getQueenAttacks(SquarePos pos);
 		// clean up methods 
 		void deleteStructures();
 		
+		// helper methods 
+		int bitScanForward(u_int64 bb);	
+		int bitScanReverse(u_int64 bb);	
+		
+		// ray attack helper methods 
+		u_int64 getRay(RayDirections dir, SquarePos pos);
+		u_int64 getPositiveRay(u_int64 lineAttacks, SquarePos pos);
+		u_int64 getNegativeRay(u_int64 lineAttacks, SquarePos pos);	
+		u_int64 getLineAttack(RayDirections dir, SquarePos pos);
+
+		u_int64 getNegativeRayAttacks(RayDirections dir, SquarePos pos);
+		u_int64 getPositiveRayAttacks(RayDirections dir, SquarePos pos);
+		u_int64 getRayAttacks(RayDirections dir, SquarePos pos);
+
 };
