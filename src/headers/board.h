@@ -300,6 +300,15 @@ class Board{
 		// ray attack helper methods 
 		u_int64 getRay(Direction dir, SquarePos pos);
 		u_int64 getRayAttacks(Direction dir, SquarePos pos);	
+		
+		// MoveSets 
+		u_int64 rookMoveSet(SquarePos pos, PieceType ct);
+		u_int64 queenMoveSet(SquarePos pos, PieceType ct);
+		u_int64 bishopMoveSet(SquarePos pos, PieceType ct);		
+		// CaptureSet 
+		u_int64 rookCaptureSet(SquarePos pos, PieceType ct);
+		u_int64 queenCaptureSet(SquarePos pos, PieceType ct);
+		u_int64 bishopCaptureSet(SquarePos pos, PieceType ct);
 
 		// other helper methods 
 		static Direction strToDirection(string dir);

@@ -25,22 +25,19 @@ int main(){
 	Board *board = new Board();
 	// THE FOLLOWING GETS THE TARGET ATTACK SQUARES 
 	// NOT INCLUDING THE PIECES OF THE PLAYER
-	board->setBoard(pt,~(~board->getRookAttacks(pos) |
-					board->getBitBoard(ct)));
+	board->setBoard(pt, board->bishopMoveSet(pos,ct));
 	board->printBitBoard(pt);
 	
-	board->setBoard(pt,~(~board->getBishopAttacks(pos) | 
-					board->getBitBoard(ct)));
+	board->setBoard(pt, board->rookMoveSet(pos,ct));
 
 	board->printBitBoard(pt);
 
-	board->setBoard(pt,~(~board->getQueenAttacks(pos) |
-					board->getBitBoard(ct)));
+	board->setBoard(pt,board->queenCaptureSet(pos,ct));
 	board->printBitBoard(pt);
 		
 		
 	// get the piecePosList 
-	SquarePos *posList = Board::bbToPosList(board->getBitBoard(pt));
+	SquarePos *posList = Board::bbToPosList(board->wPawnDoubleAttacks());
 
 	// Iterate through the position list 
 	for(SquarePos *pos = posList ; *pos!=EMPTY ; pos++){

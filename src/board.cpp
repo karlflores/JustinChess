@@ -672,6 +672,31 @@ u_int64 Board::getQueenAttacks(SquarePos pos){
 		   getRayAttacks(NW,pos);
 }
 
+// MOVE SET 
+u_int64 Board::queenMoveSet(SquarePos pos, PieceType ct){
+	return ~(~getQueenAttacks(pos) | pieceBB[ct]); 
+}
+
+u_int64 Board::rookMoveSet(SquarePos pos, PieceType ct){
+	return ~(~getRookAttacks(pos) | pieceBB[ct]); 
+}
+
+u_int64 Board::bishopMoveSet(SquarePos pos, PieceType ct){
+	return ~(~getBishopAttacks(pos) | pieceBB[ct]); 
+}
+
+// CAPTURES -- ROOK BISHOP AND QUEEN 
+u_int64 Board::rookCaptureSet(SquarePos pos, PieceType ct){
+	return getRookAttacks(pos) & pieceBB[ct ^ P_BLACK];
+}
+
+u_int64 Board::bishopCaptureSet(SquarePos pos, PieceType ct){
+	return getBishopAttacks(pos) & pieceBB[ct ^ P_BLACK];
+}
+
+u_int64 Board::queenCaptureSet(SquarePos pos, PieceType ct){
+	return getQueenAttacks(pos) & pieceBB[ct ^ P_BLACK];
+}
 // OTHER HELPTER METHODS 
 Direction Board::strToDirection(string dir){
 	if(dir.compare("N")==0) return N;
@@ -719,5 +744,3 @@ PieceType Board::strToPieceType(string pt){
 	if(pt.compare("KING") == 0) return P_KING;
 	return P_QUEEN;
 }
-
-
