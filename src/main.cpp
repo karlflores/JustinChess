@@ -28,7 +28,6 @@ int main(){
 	board->setBoard(pt,~(~board->getRookAttacks(pos) |
 					board->getBitBoard(ct)));
 	board->printBitBoard(pt);
-	board->deleteStructures();
 	
 	board->setBoard(pt,~(~board->getBishopAttacks(pos) | 
 					board->getBitBoard(ct)));
@@ -39,6 +38,7 @@ int main(){
 					board->getBitBoard(ct)));
 	board->printBitBoard(pt);
 		
+		
 	// get the piecePosList 
 	SquarePos *posList = Board::bbToPosList(board->getBitBoard(pt));
 
@@ -47,14 +47,17 @@ int main(){
 		cout << Board::positionToStr(*pos) << " ";
 	}
 	cout << "\n";
-	
-	//u_int64 *pieces = board->copy();
+	u_int64 *pieces = board->copy();
 	for(int i = 0 ; i < 8 ; i++){
-		//cout << pieces[i] << "\n";
+		cout << pieces[i] << "\n";
 	}
-	//delete(posList);
+
+	delete(posList);
 	
-	//delete(pieces);
+	delete(pieces);
+	
+	board->deleteStructures();
+
 	delete(board);
 	
 	return 0;

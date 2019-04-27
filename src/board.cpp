@@ -81,22 +81,28 @@ void Board::printBitBoard(PieceType pt){
 // Make sure to test for the empty element when iterating through the list of positions
 // also make sure to free the list afterwards
 SquarePos* Board::bbToPosList(u_int64 bb){
+	u_int64 itr = bb;
 	SquarePos buffer[64];
 	int size = 0;
 	int index = 0;
 
 	// bit scanning 
-	if(bb){
+	if(itr){
 		do{
-			index = bitScanForward(bb);
+			index = bitScanForward(itr);
 			buffer[size++] = static_cast<SquarePos>(index);
-		}while(bb &= bb-1);
+		}while(itr &= itr-1);
 	}
 	
 	// copy the buffer into the return array 
-	SquarePos *list = new SquarePos[size];
-	memcpy(list,buffer,sizeof(u_int64)*(size+1));
+	SquarePos *list = new SquarePos[size+2];
+	/*	
+	for(int i = 0 ; i < size ; i++){
+		list[i] = buffer[i];
+	}
+	*/
 
+	memcpy(list, buffer, sizeof(int)*size);
 	// Empty Sentinel - Remember to check this when iterating through it
 	list[size] = EMPTY;
 	return list;
@@ -139,7 +145,7 @@ void Board::movePiece(PieceType pt, PieceType ct, SquarePos oldPos, SquarePos ne
 }
 u_int64 *Board::copy(){
 	// create a new copy of the board, then copy everything inside the array  
-	u_int64 *newBoard = new u_int64[8];
+	u_int64 *newBoard = new u_int64[9];
 	
 	for(int i = 0 ; i < 8; i++){
 		newBoard[i] = pieceBB[i];
