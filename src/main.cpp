@@ -48,13 +48,13 @@ int main(){
 	}
 	cout << "\n";
 	
-	u_int64 *pieces = board->copy();
+	//u_int64 *pieces = board->copy();
 	for(int i = 0 ; i < 8 ; i++){
-		cout << hex << pieces[i] << "\n";
+		//cout << pieces[i] << "\n";
 	}
-	delete(posList);
+	//delete(posList);
 	
-	delete(pieces);
+	//delete(pieces);
 	delete(board);
 	
 	return 0;
