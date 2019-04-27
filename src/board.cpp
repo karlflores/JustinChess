@@ -78,6 +78,30 @@ void Board::printBitBoard(PieceType pt){
 	cout << "  A B C D E F G H\n";
 }
 
+// Make sure to test for the empty element when iterating through the list of positions
+// also make sure to free the list afterwards
+SquarePos* Board::bbToPosList(u_int64 bb){
+	SquarePos buffer[64];
+	int size = 0;
+	int index = 0;
+
+	// bit scanning 
+	if(bb){
+		do{
+			index = bitScanForward(bb);
+			buffer[size++] = static_cast<SquarePos>(index);
+		}while(bb &= bb-1);
+	}
+	
+	// copy the buffer into the return array 
+	SquarePos *list = new SquarePos[size];
+	memcpy(list,buffer,sizeof(u_int64)*(size+1));
+
+	// Empty Sentinel - Remember to check this when iterating through it
+	list[size] = EMPTY;
+	return list;
+}
+
 // returns true if a square at a given location is occupied 
 // Need to provide it with the position of that piece as well as the piece type  
 bool Board::containsPiece(PieceType pt, SquarePos pos){
@@ -113,12 +137,12 @@ void Board::movePiece(PieceType pt, PieceType ct, SquarePos oldPos, SquarePos ne
 	movePiece(pt, oldPos, newPos);
 	movePiece(ct, oldPos, newPos);	
 }
-Board Board::copy(){
+u_int64 *Board::copy(){
 	// create a new copy of the board, then copy everything inside the array  
-	Board newBoard = Board();
+	u_int64 *newBoard = new u_int64[8];
 	
-	for(int i = 0 ; i <=7; i++){
-		newBoard.pieceBB[i] = pieceBB[i];
+	for(int i = 0 ; i < 8; i++){
+		newBoard[i] = pieceBB[i];
 	}
 
 	return newBoard;
@@ -689,3 +713,5 @@ PieceType Board::strToPieceType(string pt){
 	if(pt.compare("KING") == 0) return P_KING;
 	return P_QUEEN;
 }
+
+

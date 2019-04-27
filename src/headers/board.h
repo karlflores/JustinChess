@@ -4,6 +4,7 @@
 #include <vector> 
 #include <map>
 #include <algorithm>
+#include <stack>
 
 #define NUM_PIECES 8
 #define NUM_SQUARES 64
@@ -112,7 +113,8 @@ enum SquarePos{
 	A5, B5, C5, D5, E5, F5, G5, H5,
 	A6, B6, C6, D6, E6, F6, G6, H6,
 	A7, B7, C7, D7, E7, F7, G7, H7,
-	A8, B8, C8, D8, E8, F8, G8, H8
+	A8, B8, C8, D8, E8, F8, G8, H8,
+	EMPTY
 };		
 
 const string POS_STRING[]{
@@ -143,6 +145,8 @@ class Board{
 	private:
 		u_int64 pieceBB[NUM_PIECES];
 		
+		stack<u_int64*> history;
+				
 		// Attack set generation	
 		void knightAttackSetGeneration();
 		void kingAttackSetGeneration();
@@ -190,6 +194,7 @@ class Board{
 		// test function to get all the pawns on the board 
 		u_int64 getPawns(PieceType ct);
 		
+		static SquarePos* bbToPosList(u_int64 bb);		
 		// test functions for setting, getting pieces on the board
 		void setBoard(PieceType pt, u_int64 board);
 		
@@ -216,7 +221,7 @@ class Board{
 		u_int64 getEmptySquares();
 
 		// copy board
-		Board copy();
+		u_int64 *copy();
 
 		
 		// Board transformations 
@@ -289,8 +294,8 @@ class Board{
 		void deleteStructures();
 		
 		// helper methods 
-		int bitScanForward(u_int64 bb);	
-		int bitScanReverse(u_int64 bb);	
+		static int bitScanForward(u_int64 bb);	
+		static int bitScanReverse(u_int64 bb);	
 		
 		// ray attack helper methods 
 		u_int64 getRay(Direction dir, SquarePos pos);

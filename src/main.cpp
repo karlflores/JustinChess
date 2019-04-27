@@ -25,10 +25,6 @@ int main(){
 	Board *board = new Board();
 	// THE FOLLOWING GETS THE TARGET ATTACK SQUARES 
 	// NOT INCLUDING THE PIECES OF THE PLAYER
-	board->setBoard(pt,~(~board->getQueenAttacks(pos) |
-					board->getBitBoard(ct)));
-	board->printBitBoard(pt);
-		
 	board->setBoard(pt,~(~board->getRookAttacks(pos) |
 					board->getBitBoard(ct)));
 	board->printBitBoard(pt);
@@ -38,6 +34,27 @@ int main(){
 					board->getBitBoard(ct)));
 
 	board->printBitBoard(pt);
+
+	board->setBoard(pt,~(~board->getQueenAttacks(pos) |
+					board->getBitBoard(ct)));
+	board->printBitBoard(pt);
+		
+	// get the piecePosList 
+	SquarePos *posList = Board::bbToPosList(board->getBitBoard(pt));
+
+	// Iterate through the position list 
+	for(SquarePos *pos = posList ; *pos!=EMPTY ; pos++){
+		cout << Board::positionToStr(*pos) << " ";
+	}
+	cout << "\n";
+	
+	u_int64 *pieces = board->copy();
+	for(int i = 0 ; i < 8 ; i++){
+		cout << hex << pieces[i] << "\n";
+	}
+	delete(posList);
+	
+	delete(pieces);
 	delete(board);
 	
 	return 0;
